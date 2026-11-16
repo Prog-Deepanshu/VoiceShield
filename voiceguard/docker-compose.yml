@@ -1,0 +1,67 @@
+# =============================================================================
+# VoiceGuard — Docker Compose Configuration
+# =============================================================================
+# Run:         docker-compose up -d
+# With GPU:    docker-compose --profile gpu up -d
+# Logs:        docker-compose logs -f voiceguard
+# Stop:        docker-compose down
+# =============================================================================
+
+services:
+  voiceguard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: voiceguard
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      - MODEL_VARIANT=${MODEL_VARIANT:-aasist_l}
+      - ENABLE_ENSEMBLE=${ENABLE_ENSEMBLE:-false}
+      - DEVICE=${DEVICE:-cpu}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - RISK_THRESHOLD_LOW=${RISK_THRESHOLD_LOW:-0.3}
+      - RISK_THRESHOLD_HIGH=${RISK_THRESHOLD_HIGH:-0.7}
+      - WEBHOOK_URL=${WEBHOOK_URL:-}
+      - API_KEY=${API_KEY:-}
+    volumes:
+      - ./models/weights:/app/models/weights:ro
+      - voiceguard-logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 1G
+
+  # GPU-enabled variant (use --profile gpu)
+  voiceguard-gpu:
+    extends:
+      service: voiceguard
+    container_name: voiceguard-gpu
+    profiles:
+      - gpu
+    environment:
+      - DEVICE=cuda
+      - ENABLE_HALF_PRECISION=true
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 2G
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  voiceguard-logs:
+    driver: local

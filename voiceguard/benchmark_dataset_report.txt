@@ -1,0 +1,65 @@
+VoiceGuard Dataset Benchmark Report
+===================================
+Dataset: UniDataPro/real-vs-fake-human-voice-deepfake-audio
+Date: 2026-04-14 15:25:45
+
+├── Real (Human)
+│   ├── Entry 0: Risk=HIGH (Score: 0.8405)  ✗ Incorrect
+│   ├── Entry 1: Risk=MEDIUM (Score: 0.6791)  ✗ Incorrect
+│   ├── Entry 2: Risk=MEDIUM (Score: 0.5899)  ✗ Incorrect
+│   ├── Entry 6: Risk=MEDIUM (Score: 0.6713)  ✗ Incorrect
+│   ├── Entry 7: Risk=MEDIUM (Score: 0.6820)  ✗ Incorrect
+│   ├── Entry 8: Risk=MEDIUM (Score: 0.4725)  ✗ Incorrect
+│   ├── Entry 9: Risk=HIGH (Score: 0.8134)  ✗ Incorrect
+│   ├── Entry 10: Risk=HIGH (Score: 0.9122)  ✗ Incorrect
+│   ├── Entry 11: Risk=MEDIUM (Score: 0.3852)  ✗ Incorrect
+│   ├── Entry 12: Risk=HIGH (Score: 0.7653)  ✗ Incorrect
+│   ├── Entry 13: Risk=HIGH (Score: 0.8934)  ✗ Incorrect
+│   ├── Entry 14: Risk=MEDIUM (Score: 0.4560)  ✗ Incorrect
+│   ├── Entry 15: Risk=LOW (Score: 0.0349)  ✓ Correct
+│   ├── Entry 16: Risk=MEDIUM (Score: 0.6350)  ✗ Incorrect
+│   ├── Entry 17: Risk=HIGH (Score: 0.7034)  ✗ Incorrect
+│   ├── Entry 18: Risk=MEDIUM (Score: 0.6819)  ✗ Incorrect
+│   ├── Entry 23: Risk=LOW (Score: 0.0479)  ✓ Correct
+│   ├── Entry 24: Risk=MEDIUM (Score: 0.6405)  ✗ Incorrect
+│   ├── Entry 25: Risk=HIGH (Score: 0.8877)  ✗ Incorrect
+│   ├── Entry 26: Risk=MEDIUM (Score: 0.6844)  ✗ Incorrect
+│   ├── Entry 27: Risk=LOW (Score: 0.1892)  ✓ Correct
+│   ├── Entry 28: Risk=MEDIUM (Score: 0.6389)  ✗ Incorrect
+│   ├── Entry 29: Risk=HIGH (Score: 0.8603)  ✗ Incorrect
+│   ├── Entry 30: Risk=MEDIUM (Score: 0.6401)  ✗ Incorrect
+│   ├── Entry 31: Risk=LOW (Score: 0.0650)  ✓ Correct
+│   ├── Entry 32: Risk=MEDIUM (Score: 0.6310)  ✗ Incorrect
+│   ├── Entry 33: Risk=HIGH (Score: 0.7718)  ✗ Incorrect
+│   ├── Entry 34: Risk=HIGH (Score: 0.9004)  ✗ Incorrect
+│   ├── Entry 35: Risk=LOW (Score: 0.2256)  ✓ Correct
+│   ├── Entry 36: Risk=MEDIUM (Score: 0.6674)  ✗ Incorrect
+│   ├── Entry 37: Risk=MEDIUM (Score: 0.5234)  ✗ Incorrect
+│   ├── Entry 38: Risk=MEDIUM (Score: 0.6490)  ✗ Incorrect
+│   ├── Entry 43: Risk=MEDIUM (Score: 0.5048)  ✗ Incorrect
+│   ├── Entry 44: Risk=MEDIUM (Score: 0.6597)  ✗ Incorrect
+│   ├── Entry 45: Risk=MEDIUM (Score: 0.6298)  ✗ Incorrect
+│   ├── Entry 46: Risk=HIGH (Score: 0.7682)  ✗ Incorrect
+│   ├── Entry 47: Risk=MEDIUM (Score: 0.5910)  ✗ Incorrect
+│   ├── Entry 48: Risk=HIGH (Score: 0.9614)  ✗ Incorrect
+│   └── Entry 49: Risk=HIGH (Score: 0.7745)  ✗ Incorrect
+├── Fake (Synthetic)
+│   ├── Entry 3: Risk=HIGH (Score: 0.8281)  ✓ Correct
+│   ├── Entry 4: Risk=MEDIUM (Score: 0.6916)  ✗ Incorrect
+│   ├── Entry 5: Risk=MEDIUM (Score: 0.5273)  ✗ Incorrect
+│   ├── Entry 19: Risk=LOW (Score: 0.0357)  ✗ Incorrect
+│   ├── Entry 20: Risk=MEDIUM (Score: 0.6054)  ✗ Incorrect
+│   ├── Entry 21: Risk=HIGH (Score: 0.7488)  ✓ Correct
+│   ├── Entry 22: Risk=HIGH (Score: 0.8998)  ✓ Correct
+│   ├── Entry 39: Risk=MEDIUM (Score: 0.4167)  ✗ Incorrect
+│   ├── Entry 40: Risk=HIGH (Score: 0.9134)  ✓ Correct
+│   ├── Entry 41: Risk=MEDIUM (Score: 0.5411)  ✗ Incorrect
+│   └── Entry 42: Risk=MEDIUM (Score: 0.6869)  ✗ Incorrect
+
+===================================
+  Summary:
+===================================
+Total Real (Human): 39 -> Accuracy: 12.8%
+Total Fake (Synthetic): 11 -> Accuracy: 36.4%
+-----------------------------------
+Overall Accuracy: 18.0% (9/50)

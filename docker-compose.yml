@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: voiceshield-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - MODEL_VARIANT=aasist_l
+      - DEVICE=cpu
+      - THRESHOLD_LOW=0.30
+      - THRESHOLD_HIGH=0.70
+    volumes:
+      - ./voiceguard/models/weights:/app/voiceguard/models/weights:ro
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./voiceshield/frontend
+      dockerfile: Dockerfile
+    container_name: voiceshield-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped

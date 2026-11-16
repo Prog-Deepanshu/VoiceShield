@@ -1,0 +1,39 @@
+# Python Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node.js & Frontend Build
+node_modules/
+voiceshield/frontend/node_modules/
+dist/
+voiceshield/frontend/dist/
+.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS Artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs & Temp files
+*.log
+logs/
+.tmp_*
+scratch/
+
+# Local Environment Variables
+.env
+!.env.example
