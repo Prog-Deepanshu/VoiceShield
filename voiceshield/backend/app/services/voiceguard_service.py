@@ -171,7 +171,14 @@ class VoiceGuardIntegrationService:
         if not self._is_loaded:
             raise RuntimeError("VoiceGuard model is not loaded. Call load_model() first.")
 
-        # Ensure exact length
+        # Standardize amplitude to AASIST nominal operating range (peak 0.25).
+        # This prevents SincConv front-end filterbank saturation and distortion
+        # that otherwise misclassifies human conversational speech as synthetic.
+        peak = float(np.max(np.abs(audio_window)))
+        if peak > 1e-4:
+            audio_window = (audio_window / peak) * 0.25
+
+        # Ensure exact length (64,600 samples)
         audio_window = pad_or_crop(audio_window, AASIST_NB_SAMP)
 
         # Convert to tensor of shape (1, 64600)
@@ -272,10 +279,11 @@ class VoiceGuardIntegrationService:
             )
 
         # Aggregation:
-        # A blended combination of mean score and peak suspicion gives robust whole-recording representation
+        # A robust combination of median and mean score provides resilient whole-recording representation,
+        # preventing a single transient breath or syllable from falsely triggering deepfake classification.
+        median_score = float(np.median(scores))
         mean_score = float(np.mean(scores))
-        max_score = float(np.max(scores))
-        aggregated_score = round(0.6 * mean_score + 0.4 * max_score, 4)
+        aggregated_score = round(0.7 * median_score + 0.3 * mean_score, 4)
 
         final_state, confidence = self.classify_score(aggregated_score)
         total_latency = (time.perf_counter() - start_time) * 1000

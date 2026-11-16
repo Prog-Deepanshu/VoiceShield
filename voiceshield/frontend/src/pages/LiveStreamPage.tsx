@@ -33,6 +33,7 @@ export const LiveStreamPage: React.FC = () => {
   const [historyData, setHistoryData] = useState<any[]>([]);
   const [lastResult, setLastResult] = useState<StreamResultData | null>(null);
   const [alertActive, setAlertActive] = useState(false);
+  const [micVolume, setMicVolume] = useState(0);
 
   const socketRef = useRef<WebSocket | null>(null);
   const micStreamRef = useRef<MediaStream | null>(null);
@@ -127,14 +128,42 @@ export const LiveStreamPage: React.FC = () => {
     setBufferedSeconds(0);
   };
 
+  // Downsample float32 buffer to target 16kHz
+  const downsampleTo16k = (buffer: Float32Array, inputRate: number): Float32Array => {
+    if (inputRate === 16000) return buffer;
+    const ratio = inputRate / 16000;
+    const newLen = Math.round(buffer.length / ratio);
+    const result = new Float32Array(newLen);
+    let offsetResult = 0;
+    let offsetBuffer = 0;
+    while (offsetResult < result.length) {
+      const nextOffsetBuffer = Math.round((offsetResult + 1) * ratio);
+      let sum = 0;
+      let count = 0;
+      for (let i = offsetBuffer; i < nextOffsetBuffer && i < buffer.length; i++) {
+        sum += buffer[i];
+        count++;
+      }
+      result[offsetResult] = count > 0 ? sum / count : 0;
+      offsetResult++;
+      offsetBuffer = nextOffsetBuffer;
+    }
+    return result;
+  };
+
   const startMicCapture = async (ws: WebSocket) => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: false,
+          autoGainControl: true,
+        },
+      });
       micStreamRef.current = stream;
 
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({
-        sampleRate: 16000,
-      });
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
       audioContextRef.current = audioCtx;
 
       const source = audioCtx.createMediaStreamSource(stream);
@@ -142,12 +171,23 @@ export const LiveStreamPage: React.FC = () => {
 
       processor.onaudioprocess = (e) => {
         if (ws.readyState !== WebSocket.OPEN) return;
-        const inputData = e.inputBuffer.getChannelData(0);
+        const rawInput = e.inputBuffer.getChannelData(0);
+
+        // Calculate RMS for visual volume meter
+        let sumSquares = 0;
+        for (let i = 0; i < rawInput.length; i++) {
+          sumSquares += rawInput[i] * rawInput[i];
+        }
+        const rms = Math.sqrt(sumSquares / rawInput.length);
+        setMicVolume(Math.min(100, Math.round(rms * 400)));
+
+        // Properly downsample from audioCtx.sampleRate (e.g. 44.1k/48k) to 16kHz
+        const input16k = downsampleTo16k(rawInput, audioCtx.sampleRate);
 
         // Convert float32 [-1, 1] to 16-bit PCM little-endian
-        const pcm16 = new Int16Array(inputData.length);
-        for (let i = 0; i < inputData.length; i++) {
-          const s = Math.max(-1, Math.min(1, inputData[i]));
+        const pcm16 = new Int16Array(input16k.length);
+        for (let i = 0; i < input16k.length; i++) {
+          const s = Math.max(-1, Math.min(1, input16k[i]));
           pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
         }
 
@@ -254,8 +294,11 @@ export const LiveStreamPage: React.FC = () => {
               {isStreaming ? (streamMode === 'mic' ? 'MIC STREAMING' : 'SIMULATING') : 'IDLE'}
             </span>
           </div>
-          <div className="text-xs text-slate-500 font-mono">
-            {isConnected ? 'WebSocket: /api/stream/analyze' : 'Disconnected'}
+          <div className="text-xs text-slate-500 font-mono flex items-center justify-between">
+            <span>{isConnected ? 'WebSocket: /api/stream/analyze' : 'Disconnected'}</span>
+            {isStreaming && streamMode === 'mic' && (
+              <span className="text-emerald-400 font-semibold">VU: {micVolume}%</span>
+            )}
           </div>
         </div>
 
